@@ -1,9 +1,10 @@
 (function(){ 
-
+	var _logo;
 	var _interval;
 	var _index=0;
 	var _cells;
 	var _nbCells;
+	var _comingsoon;
 
 
 	var data = {};
@@ -73,20 +74,30 @@
 		data["242"] = 1;		
 		data["252"] = 1;
 
-	initArray();
+	init();
 	_interval = setInterval(animateArray,50);
-	// animateArray();
 
 
-	function initArray(){
+	function init(){
 
-		var logo = document.getElementById("logo");
+		_comingsoon = document.getElementById("comingsoon");
+
+
+		_logo = document.getElementById("logo");
 
 		var table = document.createElement("table");
 		table.id="pixels";
 
-		var nbX = 30;
+		//calculate how big each cells should be
+		var stageWidth = window.innerWidth;
+		var stageHeight = window.innerHeight;
+
+		_comingsoon.style.top = (stageHeight-30) / 2 + 150;
+
+		var nbX = 27;
 		var nbY = 5;
+
+		var paddingCell = Math.round(((stageWidth-47)/nbX)/2);
 
 		var i=0;
 		var j=0;
@@ -98,6 +109,7 @@
 			for (j=0; j<nbX; j++){
 				td = document.createElement("td");
 				td.id="cell";
+				td.style.padding = paddingCell + "px";
 				ji = String(j)+String(i);
 				if (data[ji])
 					td.className="active";
@@ -108,27 +120,55 @@
 			table.appendChild(tr);
 		}
 
-		logo.appendChild(table);
+		_logo.appendChild(table);
 
 		_cells = document.getElementsByClassName("active");
 		_nbCells = _cells.length;
+
+		//position the _logo in the middle of the screen
+		//console.log(stageHeight)
+		//console.log(paddingCell)
+		//console.log(nbY*paddingCell + nbY)
+		_logo.style.paddingTop = Math.round((stageHeight-(nbY*paddingCell*2 + nbY))/2) + "px";
 	}
 
 	function animateArray(){
-		
-		// _cells[_index].style.backgroundColor = '#'+Math.floor(Math.random()*16777215).toString(16);
 		try {
 			_cells[Number(_index-1)].style.backgroundColor = '#000';
 		} catch (e){
 		}
 
-		// _cells[_index].style.backgroundColor = '#'+Math.floor(Math.random()*16777215).toString(16);
-		// _cells[_index].style.backgroundColor = '#fff';
+		_index++;
+
+		if (_index>_nbCells){
+			clearInterval(_interval);
+			_index = 0;
+			_interval = setInterval(moveLogo,1);
+		}
+	}
+
+	function moveLogo(){
+		var padtop = Number(String(_logo.style.paddingTop).replace(/[^-\d\.]/g, '')) - 1;
+		_logo.style.paddingTop = padtop + "px";
 
 		_index++;
 
-		if (_index>_nbCells)
-			clearInterval(_interval)
+		if (_index>120){
+			clearInterval(_interval);
+			_index = 0;
+			_interval = setInterval(showComingSoon,1);
+		}
+	}
+
+	function showComingSoon(){
+		_index += 0.01;
+		_comingsoon.style.opacity=_index;
+
+		if (_comingsoon.style.opacity>1){
+			clearInterval(_interval);
+		}
+
+		
 	}
 
 }()); 
